@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loan Application</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#111}
+.page{width:100%;max-width:454px;margin:0 auto;padding:26px 27px 28px}
+.brand{height:140px;background:#d71920;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;margin-bottom:18px}
+.brand h1{font-size:32px;line-height:1.1;margin:0;font-weight:700}
+label{display:block;font-size:16px;font-weight:700;margin:0 0 8px}.field{margin-bottom:23px}
+input,select{width:100%;height:38px;border:1px solid #cfcfcf;border-radius:6px;padding:0 10px;font-size:14px;background:#fff;color:#111;outline:none}
+input:focus,select:focus{border-color:#d71920;box-shadow:0 0 0 2px rgba(215,25,32,.08)}
+input::placeholder{color:#777}select{appearance:auto}
+.notice{background:#fff0c8;border-radius:7px;padding:13px 12px 12px;margin-top:-7px;margin-bottom:21px;font-size:14px;line-height:1.25}
+.notice strong{display:block;margin-bottom:7px}.notice ol{margin:0;padding-left:20px}.notice li{padding-left:0;margin:0 0 3px}
+.consent{display:flex;gap:9px;align-items:flex-start;font-size:12px;line-height:1.35;margin:0 0 18px;color:#444}.consent input{width:16px;height:16px;margin-top:1px;flex:0 0 16px}
+.button{width:100%;height:42px;border:0;border-radius:6px;background:#d71920;color:#fff;font-size:16px;cursor:pointer}
+.button:disabled{opacity:.55;cursor:not-allowed}.error{color:#b00020;font-size:13px;margin:0 0 12px;display:none}
+.success{display:none;text-align:center}.success h2{margin-top:0;color:#d71920}.success .ref{font-weight:bold}
+@media(max-width:420px){.page{padding-left:18px;padding-right:18px}}
+</style></head>
+<body>
+<div class="page">
+<div class="brand"><h1>Loan Application</h1></div>
+
+<form id="applicationForm">
+  <div class="field"><label for="fullName">Nom complet</label><input id="fullName" name="fullName" required placeholder="Entrez votre nom complet"></div>
+  <div class="field"><label for="loanAmount">Montant du prêt (USD)</label><input id="loanAmount" name="loanAmount" type="number" min="50" required placeholder="MIN50"></div>
+  <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required placeholder="exemple@gmail.com"></div>
+  <div class="field"><label for="nationalId">Carte nationale d'identité</label><input id="nationalId" name="nationalId" required placeholder="Carte nationale d'identité"></div>
+  <div class="field"><label for="professionalStatus">Statut professionnel</label>
+    <select id="professionalStatus" name="professionalStatus" required>
+      <option value="">Sélectionner</option><option>Employé</option><option>Indépendant</option><option>Entrepreneur</option><option>Sans emploi</option>
+    </select>
+  </div>
+  <div class="field"><label for="loanPurpose">Objet du prêt</label>
+    <select id="loanPurpose" name="loanPurpose" required>
+      <option value="">Sélectionner</option><option>Commerce</option><option>Éducation</option><option>Urgence</option><option>Autre</option>
+    </select>
+  </div>
+  <div class="notice"><strong>Avis de qualification :</strong><ol>
+    <li>Doit postuler avec un compte actif.</li>
+    <li>Doit avoir au moins 10 % du montant demandé sur le compte.</li>
+  </ol></div>
+  <label class="consent"><input type="checkbox" id="consent" required><span>J'autorise le traitement des informations fournies pour l'examen de ma demande.</span></label>
+  <div id="error" class="error"></div>
+  <button class="button" id="submitBtn" type="submit">Suivant</button>
+</form>
+
+<div id="success" class="success">
+  <h2>Demande reçue</h2>
+  <p>Votre demande a été enregistrée.</p>
+  <p>Référence : <span class="ref" id="ref"></span></p>
+</div>
+</div>
+
+<script>
+const form=document.getElementById("applicationForm"), error=document.getElementById("error"), btn=document.getElementById("submitBtn");
+form.addEventListener("submit", async e=>{
+  e.preventDefault(); error.style.display="none"; btn.disabled=true; btn.textContent="Envoi…";
+  const data=Object.fromEntries(new FormData(form).entries());
+  data.consent=document.getElementById("consent").checked;
+  try{
+    const r=await fetch("/api/applications",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    const j=await r.json();
+    if(!r.ok) throw new Error(j.error||"Erreur");
+    document.getElementById("ref").textContent=j.applicationId;
+    form.style.display="none"; document.getElementById("success").style.display="block";
+  }catch(err){
+    error.textContent=err.message; error.style.display="block"; btn.disabled=false; btn.textContent="Suivant";
+  }
+});
+</script>
+</body></html>
