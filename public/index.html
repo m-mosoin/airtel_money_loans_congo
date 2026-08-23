@@ -1,0 +1,54 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Loan Application</title><style>
+*{box-sizing:border-box}body{margin:0;background:#fff;font-family:Arial,Helvetica,sans-serif;color:#111}
+.page{max-width:454px;margin:auto;padding:26px 27px 28px}.brand{height:140px;background:#d71920;color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.brand h1{font-size:32px;margin:0}label{display:block;font-size:16px;font-weight:700;margin-bottom:8px}.field{margin-bottom:23px}
+input,select{width:100%;height:38px;border:1px solid #cfcfcf;border-radius:6px;padding:0 10px;font-size:14px;background:#fff}
+.phone-row{display:grid;grid-template-columns:44% 56%;gap:7px}.phone-row select,.phone-row input{width:100%}
+.notice{background:#fff0c8;border-radius:7px;padding:13px 12px;margin-top:-7px;margin-bottom:21px;font-size:14px;line-height:1.25}
+.notice strong{display:block;margin-bottom:7px}.notice ol{margin:0;padding-left:20px}.notice li{margin-bottom:3px}
+.consent{display:flex;gap:9px;align-items:flex-start;font-size:12px;font-weight:400;line-height:1.35;margin-bottom:18px;color:#444}
+.consent input{width:16px;height:16px;margin-top:1px;flex:0 0 16px}
+.button{width:100%;height:42px;border:0;border-radius:6px;background:#d71920;color:#fff;font-size:16px;cursor:pointer}
+.error{display:none;color:#b00020;font-size:13px;margin-bottom:12px}.success{display:none;text-align:center}
+.success h2{color:#d71920}@media(max-width:420px){.page{padding-left:18px;padding-right:18px}.phone-row{grid-template-columns:46% 54%}}
+</style></head><body><div class="page">
+<div class="brand"><h1>Loan Application</h1></div>
+<form id="applicationForm">
+<div class="field"><label>Nom complet</label><input name="fullName" required placeholder="Entrez votre nom complet"></div>
+<div class="field"><label>Numéro de téléphone</label><div class="phone-row">
+<select name="countryCode" required><option value="">Pays</option><option value="+243">🇨🇩 RDC (+243)</option>
+<option value="+242">🇨🇬 Congo (+242)</option>
+<option value="+254">🇰🇪 Kenya (+254)</option>
+<option value="+256">🇺🇬 Ouganda (+256)</option>
+<option value="+250">🇷🇼 Rwanda (+250)</option>
+<option value="+257">🇧🇮 Burundi (+257)</option>
+<option value="+255">🇹🇿 Tanzanie (+255)</option>
+<option value="+260">🇿🇲 Zambie (+260)</option>
+<option value="+27">🇿🇦 Afrique du Sud (+27)</option>
+<option value="+244">🇦🇴 Angola (+244)</option>
+<option value="+234">🇳🇬 Nigeria (+234)</option>
+<option value="+233">🇬🇭 Ghana (+233)</option>
+<option value="+237">🇨🇲 Cameroun (+237)</option>
+<option value="+225">🇨🇮 Côte d'Ivoire (+225)</option>
+<option value="+221">🇸🇳 Sénégal (+221)</option>
+<option value="+33">🇫🇷 France (+33)</option>
+<option value="+32">🇧🇪 Belgique (+32)</option>
+<option value="+1">🇨🇦 Canada (+1)</option>
+<option value="+1">🇺🇸 États-Unis (+1)</option>
+<option value="+44">🇬🇧 Royaume-Uni (+44)</option></select>
+<input name="phoneNumber" type="tel" inputmode="tel" autocomplete="tel" required placeholder="8XX XXX XXX">
+</div></div>
+<div class="field"><label>Montant du prêt (USD)</label><input name="loanAmount" type="number" min="50" required placeholder="MIN50"></div>
+<div class="field"><label>Email</label><input name="email" type="email" required placeholder="exemple@gmail.com"></div>
+<div class="field"><label>Carte nationale d'identité</label><input name="nationalId" required placeholder="Carte nationale d'identité"></div>
+<div class="field"><label>Statut professionnel</label><select name="professionalStatus" required><option value="">Sélectionner</option><option>Employé</option><option>Indépendant</option><option>Entrepreneur</option><option>Sans emploi</option></select></div>
+<div class="field"><label>Objet du prêt</label><select name="loanPurpose" required><option value="">Sélectionner</option><option>Commerce</option><option>Éducation</option><option>Urgence</option><option>Autre</option></select></div>
+<div class="notice"><strong>Avis de qualification :</strong><ol><li>Doit postuler avec un compte actif.</li><li>Doit avoir au moins 10 % du montant demandé sur le compte.</li></ol></div>
+<label class="consent"><input name="consent" type="checkbox" required><span>J'autorise le traitement des informations fournies pour l'examen de ma demande.</span></label>
+<div id="error" class="error"></div><button class="button" id="submitBtn">Suivant</button>
+</form><div id="success" class="success"><h2>Demande reçue</h2><p>Votre demande a été enregistrée.</p><p>Référence : <b id="ref"></b></p></div>
+</div><script>
+document.getElementById("applicationForm").addEventListener("submit",async e=>{e.preventDefault();const f=e.target,b=document.getElementById("submitBtn"),err=document.getElementById("error");err.style.display="none";b.disabled=true;b.textContent="Envoi…";
+const d=Object.fromEntries(new FormData(f).entries());d.consent=f.consent.checked;try{const r=await fetch("/api/applications",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});const j=await r.json();if(!r.ok)throw Error(j.error||"Erreur");document.getElementById("ref").textContent=j.applicationId;f.style.display="none";document.getElementById("success").style.display="block"}catch(x){err.textContent=x.message;err.style.display="block";b.disabled=false;b.textContent="Suivant"}});
+</script></body></html>
